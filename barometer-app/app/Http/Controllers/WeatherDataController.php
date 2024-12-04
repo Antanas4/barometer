@@ -18,6 +18,6 @@ class WeatherDataController extends Controller
     {
         $weatherData = $this->weatherService->getWeatherData($locationName);
 
-        return response()->json(['weather_data' => $weatherData]);
+        return response()->json(['pressure' => $weatherData]);
     }
 }
