@@ -1,9 +1,14 @@
 import React, { useEffect, useState } from "react";
 import Barometer from "@/Components/Barometer";
+import LocationToggleButton from "@/Components/LocationToggleButton";
 
 const Home = () => {
     const [pressure, setPressure] = useState(null);
-    const locationName = "Nida";
+    const [locationName, setLocationName] = useState("Vilnius");
+
+    const handleLocationChange = (newLocation) => {
+        setLocationName(newLocation);
+    };
 
     useEffect(() => {
         const fetchWeatherData = async () => {
@@ -20,8 +25,9 @@ const Home = () => {
                 console.error("Error fetching weather data:", error);
             }
         };
-
         fetchWeatherData();
+        const intervalId = setInterval(fetchWeatherData, 60 * 60 * 1000); // 60 minutes
+        return () => clearInterval(intervalId);
     }, [locationName]);
 
     return (
@@ -32,6 +38,12 @@ const Home = () => {
                 ) : (
                     <p>Loading pressure data...</p>
                 )}
+            </div>
+            <div className="location-btn-group">
+                <LocationToggleButton
+                    locationName={locationName}
+                    onLocationChange={handleLocationChange}
+                />
             </div>
         </div>
     );
