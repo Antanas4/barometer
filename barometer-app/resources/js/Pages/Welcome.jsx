@@ -1,10 +1,12 @@
-// resources/js/Home.js
-import React from 'react';
+import React from "react";
+import Barometer from "@/Components/Barometer";
 
 const Home = () => {
     return (
-        <div>
-            <h1>Welcome to the Home Page!</h1>
+        <div className="home-container">
+            <div className="barometer-container">
+                <Barometer />
+            </div>
         </div>
     );
 };

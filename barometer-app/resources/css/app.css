@@ -1,3 +1,15 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+body {
+    background-color: #021526; 
+}
+
+.home-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.barometer-container {
+    width: 800px;
+    height: 800px;
+    margin: 2em 2em;
+}
