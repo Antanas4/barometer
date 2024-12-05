@@ -11,4 +11,4 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/weather/{locationName}', [WeatherDataController::class, 'getWeatherData']);
+Route::get('/{locationName}', [WeatherDataController::class, 'getWeatherData']);

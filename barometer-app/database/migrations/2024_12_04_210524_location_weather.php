@@ -10,13 +10,12 @@ return new class extends Migration
     {
         Schema::create('location_weather', function (Blueprint $table) {
             $table->id();
-            $table->string('location_name'); 
+            $table->string('locationName'); 
             $table->decimal('latitude', 10, 6); 
             $table->decimal('longitude', 10, 6); 
             $table->decimal('pressure', 8, 2); 
-            $table->boolean('pressure_rising'); 
-            $table->timestamp('record_timestamp'); 
-            $table->timestamps();
+            $table->boolean('pressureRising'); 
+            $table->timestamp('recordTimestamp'); 
         });
     }
 

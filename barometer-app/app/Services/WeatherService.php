@@ -3,14 +3,60 @@ namespace App\Services;
 
 use App\Models\LocationWeather;
 use Illuminate\Support\Facades\Http;
+use Carbon\Carbon;
 
 class WeatherService
 {
-    public function getWeatherData(string $location)
+    public function getWeatherData(string $locationName)
+    {
+        $lastWeatherRecord = $this->getLastWeatherRecord($locationName);
+
+        if (!$lastWeatherRecord || Carbon::now()->diffInHours($lastWeatherRecord->recordTimestamp) >= 1) {
+            $this->saveWeatherData($locationName);
+            $lastWeatherRecord = $this->getLastWeatherRecord($locationName);
+        }
+
+        return $lastWeatherRecord;
+    }
+
+    private function saveWeatherData(string $locationName)
+    {
+        $coordinates = config("locations.$locationName");
+        $currentPressure = $this->getCurrentPressure($locationName);
+        $lastWeatherRecord = $this->getLastWeatherRecord($locationName);
+        $pressureRising = null;
+
+        if (!$coordinates) {
+            throw new \Exception("Coordinates for $locationName not found.");
+        }
+
+        if ($lastWeatherRecord){
+            $pressureRising = $currentPressure > $lastWeatherRecord->pressure;
+        }
+        
+        \Log::info("Saving data for $locationName with coordinates:", $coordinates);
+
+        LocationWeather::create([
+            'locationName' => $locationName,
+            'latitude' => $coordinates['lat'],
+            'longitude' => $coordinates['lon'],
+            'pressure' => $currentPressure,
+            'pressureRising' => $pressureRising,
+            'recordTimestamp' => Carbon::now(),
+        ]);
+    }
+
+    private function getLastWeatherRecord(string $locationName)
+    {
+        return LocationWeather::where('locationName', $locationName)
+            ->orderBy('recordTimestamp', 'desc')
+            ->first();
+    }
+
+    private function getCurrentPressure(string $locationName)
     {
         $apiKey = env('OPENWEATHERMAP_API_KEY');
-
-        $coordinates = config("locations.$location", config('locations.Vilnius'));
+        $coordinates = config("locations.$locationName", config('locations.Vilnius'));
 
         $response = Http::get('https://api.openweathermap.org/data/2.5/weather', [
             'lat' => $coordinates['lat'],
@@ -19,29 +65,10 @@ class WeatherService
             'units' => 'metric',
         ]);
 
-        if ($response->successful()) {
-            return $response->json()['main']['pressure'];
+        if ($response->successful() && isset($response['main']['pressure'])) {
+            return $response['main']['pressure'];
         }
-
-        Log::error("OpenWeatherMap request failed", ['response' => $response->body()]);
-        return response()->json(['error' => 'Unable to fetch weather data'], 500);
-    }
-
-    private function storeWeatherData(array $data)
-    {
-        $weatherData = new WeatherData();
-        $weatherData->location = $data['city']['name'];
-        $weatherData->pressure = $data['list'][0]['main']['pressure'];
-        $weatherData->temperature = $data['list'][0]['main']['temp'];
-        $weatherData->humidity = $data['list'][0]['main']['humidity'];
-        $weatherData->recorded_at = now();
-        $weatherData->save();
-
-        return $weatherData;
-    }
-
-    public function calculatePressureTrend(WeatherData $current, WeatherData $previous)
-    {
-        return $current->pressure > $previous->pressure ? 'rising' : 'falling';
+    
+        throw new \Exception("Failed to fetch pressure data for $locationName.");
     }
 }

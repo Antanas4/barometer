@@ -16,8 +16,17 @@ class WeatherDataController extends Controller
 
     public function getWeatherData(Request $request, string $locationName)
     {
-        $weatherData = $this->weatherService->getWeatherData($locationName);
-
-        return response()->json(['pressure' => $weatherData]);
+        try {
+            $locationWeather = $this->weatherService->getWeatherData($locationName);
+            return response()->json([
+                'success' => true,
+                'data' => $locationWeather
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500); 
+        }
     }
 }
