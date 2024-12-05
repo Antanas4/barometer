@@ -2,7 +2,7 @@ import React from "react";
 import GaugeComponent from "react-gauge-component";
 import { defaultTickLabels } from "react-gauge-component/dist/lib/GaugeComponent/types/Tick";
 
-const Barometer = () => {
+const Barometer = ({pressure}) => {
     return (
         <GaugeComponent
             type="radial"
@@ -34,7 +34,7 @@ const Barometer = () => {
                     {},
                 ],
             }}
-            value={982}
+            value={pressure || null}
             pointer={{ 
                 type: "needle", 
                 elastic: false,
