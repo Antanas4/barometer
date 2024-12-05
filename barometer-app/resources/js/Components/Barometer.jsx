@@ -34,7 +34,7 @@ const Barometer = () => {
                     {},
                 ],
             }}
-            value={980}
+            value={982}
             pointer={{ 
                 type: "needle", 
                 elastic: false,
@@ -47,7 +47,7 @@ const Barometer = () => {
                 tickLabels: {
                     defaultTickValueConfig:{
                         style: {
-                            fontSize: "12px"
+                            fontSize: "15px"
                         }
                     }
                 }
