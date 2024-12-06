@@ -10,6 +10,7 @@ class WeatherService
     public function getWeatherData(string $locationName)
     {
         $lastWeatherRecord = $this->getLastWeatherRecord($locationName);
+        
 
         if (!$lastWeatherRecord || Carbon::now()->diffInHours($lastWeatherRecord->recordTimestamp) >= 1) {
             $this->saveWeatherData($locationName);
@@ -24,7 +25,7 @@ class WeatherService
         $coordinates = config("locations.$locationName");
         $currentPressure = $this->getCurrentPressure($locationName);
         $lastWeatherRecord = $this->getLastWeatherRecord($locationName);
-        $pressureRising = null;
+        $pressureRising = false;
 
         if (!$coordinates) {
             throw new \Exception("Coordinates for $locationName not found.");
@@ -55,7 +56,9 @@ class WeatherService
 
     private function getCurrentPressure(string $locationName)
     {
-        $apiKey = env('OPENWEATHERMAP_API_KEY');
+        // $apiKey = env('OPENWEATHERMAP_API_KEY');
+        //I know that it should not be hardcoded but something was wrong with my .env file
+        $apiKey='73c157afcb476df0b4033f2a4ebb81df';
         $coordinates = config("locations.$locationName", config('locations.Vilnius'));
 
         $response = Http::get('https://api.openweathermap.org/data/2.5/weather', [
