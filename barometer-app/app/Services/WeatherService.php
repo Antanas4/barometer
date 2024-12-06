@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services;
 
 use App\Models\LocationWeather;
@@ -10,56 +11,48 @@ class WeatherService
     public function getWeatherData(string $locationName)
     {
         $lastWeatherRecord = $this->getLastWeatherRecord($locationName);
-        
 
-        if (!$lastWeatherRecord || abs(Carbon::now()->diffInHours($lastWeatherRecord->recordTimestamp)) >= 1) {
-            $this->saveWeatherData($locationName);
+        if ($this->shouldFetchNewData($lastWeatherRecord)) {
+            $newWeatherData = $this->fetchWeatherData($locationName);
+            $this->saveWeatherData($locationName, $newWeatherData);
             $lastWeatherRecord = $this->getLastWeatherRecord($locationName);
         }
 
         return $lastWeatherRecord;
     }
 
-    private function saveWeatherData(string $locationName)
+    private function shouldFetchNewData(?LocationWeather $lastWeatherRecord): bool
+    {
+        return !$lastWeatherRecord || abs(Carbon::now()->diffInHours($lastWeatherRecord->recordTimestamp))>= 1;
+    }
+
+    private function fetchWeatherData(string $locationName): array
+    {
+        $coordinates = $this->getCoordinates($locationName);
+        $pressure = $this->fetchPressureFromAPI($coordinates);
+
+        return [
+            'pressure' => $pressure,
+            'coordinates' => $coordinates,
+        ];
+    }
+
+    private function getCoordinates(string $locationName): array
     {
         $coordinates = config("locations.$locationName");
-        $currentPressure = $this->getCurrentPressure($locationName);
-        $lastWeatherRecord = $this->getLastWeatherRecord($locationName);
-        $pressureRising = false;
 
         if (!$coordinates) {
-            throw new \Exception("Coordinates for $locationName not found.");
+            throw new \InvalidArgumentException("Coordinates for $locationName not found.");
         }
 
-        if ($lastWeatherRecord){
-            $pressureRising = $currentPressure > $lastWeatherRecord->pressure;
-        }
-        
-        \Log::info("Saving data for $locationName with coordinates:", $coordinates);
-
-        LocationWeather::create([
-            'locationName' => $locationName,
-            'latitude' => $coordinates['lat'],
-            'longitude' => $coordinates['lon'],
-            'pressure' => $currentPressure,
-            'pressureRising' => $pressureRising,
-            'recordTimestamp' => Carbon::now(),
-        ]);
+        return $coordinates;
     }
 
-    private function getLastWeatherRecord(string $locationName)
-    {
-        return LocationWeather::where('locationName', $locationName)
-            ->orderBy('recordTimestamp', 'desc')
-            ->first();
-    }
-
-    private function getCurrentPressure(string $locationName)
+    private function fetchPressureFromAPI(array $coordinates): int
     {
         // $apiKey = env('OPENWEATHERMAP_API_KEY');
         //I know that it should not be hardcoded but something was wrong with my .env file
         $apiKey='73c157afcb476df0b4033f2a4ebb81df';
-        $coordinates = config("locations.$locationName", config('locations.Vilnius'));
 
         $response = Http::get('https://api.openweathermap.org/data/2.5/weather', [
             'lat' => $coordinates['lat'],
@@ -71,7 +64,31 @@ class WeatherService
         if ($response->successful() && isset($response['main']['pressure'])) {
             return $response['main']['pressure'];
         }
-    
-        throw new \Exception("Failed to fetch pressure data for $locationName.");
+
+        throw new \RuntimeException('Failed to fetch pressure data.');
+    }
+
+    private function saveWeatherData(string $locationName, array $weatherData)
+    {
+        $lastWeatherRecord = $this->getLastWeatherRecord($locationName);
+        $pressureRising = $lastWeatherRecord
+            ? $weatherData['pressure'] > $lastWeatherRecord->pressure
+            : false;
+
+        LocationWeather::create([
+            'locationName' => $locationName,
+            'latitude' => $weatherData['coordinates']['lat'],
+            'longitude' => $weatherData['coordinates']['lon'],
+            'pressure' => $weatherData['pressure'],
+            'pressureRising' => $pressureRising,
+            'recordTimestamp' => Carbon::now(),
+        ]);
+    }
+
+    private function getLastWeatherRecord(string $locationName): ?LocationWeather
+    {
+        return LocationWeather::where('locationName', $locationName)
+            ->latest('recordTimestamp')
+            ->first();
     }
 }
