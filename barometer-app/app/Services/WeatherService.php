@@ -12,7 +12,7 @@ class WeatherService
         $lastWeatherRecord = $this->getLastWeatherRecord($locationName);
         
 
-        if (!$lastWeatherRecord || Carbon::now()->diffInHours($lastWeatherRecord->recordTimestamp) >= 1) {
+        if (!$lastWeatherRecord || abs(Carbon::now()->diffInHours($lastWeatherRecord->recordTimestamp)) >= 1) {
             $this->saveWeatherData($locationName);
             $lastWeatherRecord = $this->getLastWeatherRecord($locationName);
         }

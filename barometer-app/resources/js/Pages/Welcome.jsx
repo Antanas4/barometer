@@ -35,7 +35,7 @@ const Home = () => {
             }
         };
         fetchWeatherData();
-        const intervalId = setInterval(fetchWeatherData, 60 * 60 * 1000); // 60 minutes
+        const intervalId = setInterval(fetchWeatherData, 60 * 60 * 1000);
         return () => clearInterval(intervalId);
     }, [locationName]);
 
