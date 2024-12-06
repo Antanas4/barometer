@@ -10,6 +10,15 @@ const Home = () => {
         setLocationName(newLocation);
     };
 
+    const determineWeatherCondition = (pressure) => {
+        if (pressure < 980) return "Stormy";
+        if (pressure >= 980 && pressure < 1000) return "Rain";
+        if (pressure >= 1000 && pressure < 1010) return "Change";
+        if (pressure >= 1010 && pressure < 1020) return "Fair";
+        if (pressure >= 1020) return "Very Dry";
+        return "Unknown";
+    };
+
     useEffect(() => {
         const fetchWeatherData = async () => {
             try {
@@ -34,7 +43,9 @@ const Home = () => {
         <div className="home-container">
             <div className="barometer-container">
                 {pressure !== null ? (
-                    <Barometer pressure={pressure} />
+                    <>
+                        <Barometer pressure={pressure} />
+                    </>
                 ) : (
                     <p>Loading pressure data...</p>
                 )}

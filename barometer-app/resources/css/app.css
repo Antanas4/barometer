@@ -12,9 +12,13 @@ body {
 
 .barometer-container {
     width: 800px;
-    height: 800px;
+    height: 650px;
 }
 
 #barometer{
     padding-top: 2em;
+}
+
+.location-btn-group{
+    
 }
