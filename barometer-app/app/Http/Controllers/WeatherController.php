@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Services\WeatherService;
 
-class WeatherDataController extends Controller
+class WeatherController extends Controller
 {
     protected $weatherService;
 

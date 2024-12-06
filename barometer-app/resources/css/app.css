@@ -19,6 +19,7 @@ body {
     padding-top: 2em;
 }
 
-.location-btn-group{
-    
+.updated-at-field,
+.weather-condition-field{
+    color: white;
 }

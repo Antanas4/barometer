@@ -5,6 +5,7 @@ import LocationToggleButton from "@/Components/LocationToggleButton";
 const Home = () => {
     const [pressure, setPressure] = useState(null);
     const [locationName, setLocationName] = useState("Vilnius");
+    const [recordStamp, setRecordStamp] = useState("");
 
     const handleLocationChange = (newLocation) => {
         setLocationName(newLocation);
@@ -27,6 +28,7 @@ const Home = () => {
 
                 if (data.success) {
                     setPressure(data.data.pressure);
+                    setRecordStamp(data.data.recordTimestamp);
                 } else {
                     console.error("Failed to fetch weather data");
                 }
@@ -55,6 +57,21 @@ const Home = () => {
                     locationName={locationName}
                     onLocationChange={handleLocationChange}
                 />
+            </div>
+            <div className="updated-at-field">
+                {recordStamp && (
+                    <p className="updated-at">
+                        Last updated at:{" "}
+                        {new Date(recordStamp).toLocaleString()}{" "}
+                    </p>
+                )}
+            </div>
+            <div className="weather-condition-field">
+                {pressure !== null && (
+                    <p className="weather-condition">
+                        Weather condition: {determineWeatherCondition(pressure)}
+                    </p>
+                )}
             </div>
         </div>
     );
