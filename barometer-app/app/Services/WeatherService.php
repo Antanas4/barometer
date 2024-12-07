@@ -37,7 +37,7 @@ class WeatherService
         ];
     }
 
-    private function getCoordinates(string $locationName): array
+    public function getCoordinates(string $locationName): array
     {
         $coordinates = config("locations.$locationName");
 
