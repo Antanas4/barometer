@@ -23,7 +23,8 @@ class WeatherService
 
     private function shouldFetchNewData(?LocationWeather $lastWeatherRecord): bool
     {
-        return !$lastWeatherRecord || abs(Carbon::now()->diffInHours($lastWeatherRecord->recordTimestamp))>= 1;
+        $currentTime = Carbon::now()->addHours(2);
+        return !$lastWeatherRecord || abs($currentTime->diffInHours($lastWeatherRecord->recordTimestamp))>= 1;
     }
 
     private function fetchWeatherData(string $locationName): array
