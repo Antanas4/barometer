@@ -63,6 +63,8 @@ const Home = () => {
                     <p className="updated-at">
                         Last updated at:{" "}
                         {new Date(recordStamp).toLocaleString()}{" "}
+                        {" "}
+                        (Updates are fetched every hour)
                     </p>
                 )}
             </div>
