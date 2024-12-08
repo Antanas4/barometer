@@ -81,7 +81,8 @@ class WeatherService
             'longitude' => $weatherData['coordinates']['lon'],
             'pressure' => $weatherData['pressure'],
             'pressureRising' => $pressureRising,
-            'recordTimestamp' => Carbon::now(),
+            'recordTimestamp' => Carbon::now()->addHours(2), 
+            //adding +2 hours, because Carbon uses UTC
         ]);
     }
 

@@ -23,3 +23,7 @@ body {
 .weather-condition-field{
     color: white;
 }
+
+.updated-at-field{
+    padding-top: 15px;
+}
