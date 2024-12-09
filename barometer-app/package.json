@@ -24,6 +24,7 @@
         "@emotion/react": "^11.13.5",
         "@emotion/styled": "^11.13.5",
         "@mui/material": "^6.1.10",
+        "i": "^0.3.7",
         "react-gauge-component": "^1.2.62"
     }
 }
