@@ -28,13 +28,9 @@ COPY . /app
 # Install PHP dependencies using Composer
 RUN composer install
 
-# Install React frontend dependencies using NPM
-RUN npm install
-
 
 # Expose the application port
 EXPOSE 8000
-EXPOSE 3000  
 
 # Start the Laravel server
-CMD php artisan serve --host=0.0.0.0 --port=8000 & npm run dev
+CMD php artisan serve --host=0.0.0.0 --port=8000
