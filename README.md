@@ -8,7 +8,7 @@ To setup environment and run the application:
 9.  run command 'npm install'
 10.  cd ..
 11.  run command 'docker compose up --build'
-12.  then stop this docker service with ctrl(or cmd on mac) + c
+12.  then stop this docker service with ctrl + c
 13.  run command 'docker compose up db'
 14.  in other terminal from /barometer-app run command 'php artisan serve'
 15.  in other terminal run command 'npm run dev'
